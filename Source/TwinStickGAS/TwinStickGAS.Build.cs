@@ -8,6 +8,18 @@ public class TwinStickGAS : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore",  "EnhancedInput", "ObjectPool" });
+		PublicDependencyModuleNames.AddRange(new string[] 
+		{ 
+			"Core",
+			"CoreUObject",
+			"Engine",
+			"InputCore",
+			"EnhancedInput",
+			"ModularGameplay",
+			"GameplayAbilities",
+			"GameplayTags",
+			"GameplayTasks",
+			"ObjectPool"
+		});
 	}
 }

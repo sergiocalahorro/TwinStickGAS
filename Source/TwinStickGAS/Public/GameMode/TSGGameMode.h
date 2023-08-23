@@ -2,17 +2,21 @@
 
 #pragma once
 
+// Headers - Unreal Engine
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
-#include "TwinStickGASGameMode.generated.h"
+
+#include "TSGGameMode.generated.h"
 
 UCLASS(minimalapi)
-class ATwinStickGASGameMode : public AGameModeBase
+class ATSGGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
 
 public:
-	ATwinStickGASGameMode();
+
+	/** Sets default values for this actor's properties */
+	ATSGGameMode();
 };
 
 
