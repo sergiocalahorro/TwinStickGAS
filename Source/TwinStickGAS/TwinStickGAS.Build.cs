@@ -15,11 +15,16 @@ public class TwinStickGAS : ModuleRules
 			"Engine",
 			"InputCore",
 			"EnhancedInput",
+			"CommonInput",
+			"ObjectPool"
+		});
+		
+		PrivateDependencyModuleNames.AddRange(new string[]
+		{
 			"ModularGameplay",
 			"GameplayAbilities",
 			"GameplayTags",
-			"GameplayTasks",
-			"ObjectPool"
+			"GameplayTasks"
 		});
 	}
 }

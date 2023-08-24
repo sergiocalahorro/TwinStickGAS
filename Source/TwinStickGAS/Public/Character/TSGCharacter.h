@@ -5,6 +5,7 @@
 // Headers - Unreal Engine
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "AbilitySystemInterface.h"
 
 #include "TSGCharacter.generated.h"
 
@@ -15,10 +16,13 @@ class UInputComponent;
 struct FInputActionValue;
 
 // Forward declarations - TwinStickGAS
+class ATSGGameMode;
 class UTSGInputBindingComponent;
+class UTSGAbilitySystemComponent;
+class UTSGHealthComponent;
 
 UCLASS(config=Game)
-class ATSGCharacter : public ACharacter
+class ATSGCharacter : public ACharacter, public IAbilitySystemInterface
 {
 	GENERATED_BODY()
 
@@ -39,6 +43,9 @@ protected:
 	/** Allow actors to initialize themselves on the C++ side after all of their components have been initialized */
 	virtual void PostInitializeComponents() override;
 	
+	/** Called when this Pawn is possessed */
+	virtual void PossessedBy(AController* NewController) override;
+	
 	/** Called when the game starts */
 	virtual void BeginPlay() override;
 
@@ -46,33 +53,47 @@ protected:
 
 #pragma region COMPONENTS
 	
-public:
-	
-	/** Returns CameraBoom subobject */
-	FORCEINLINE USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
-	
-	/** Returns FollowCamera subobject */
-	FORCEINLINE UCameraComponent* GetFollowCamera() const { return FollowCamera; }
-
 private:
 
-	/** Camera boom */
+	/** Spring Arm */
 	UPROPERTY(VisibleAnywhere, Category = "AA|Components")
-	TObjectPtr<USpringArmComponent> CameraBoom;
+	TObjectPtr<USpringArmComponent> SpringArm;
 
-	/** Follow camera */
+	/** Camera */
 	UPROPERTY(VisibleAnywhere, Category = "AA|Components")
-	TObjectPtr<UCameraComponent> FollowCamera;
+	TObjectPtr<UCameraComponent> Camera;
 
 	/** Input binding component */
 	UPROPERTY(VisibleAnywhere, Category = "AA|Components")
 	TObjectPtr<UTSGInputBindingComponent> InputBindingComponent;
 
+	/** Ability system */
+	UPROPERTY(VisibleAnywhere, Category = "AA|Components")
+	TObjectPtr<UTSGAbilitySystemComponent> AbilitySystemComponent;
+
+	/** Health component */
+	UPROPERTY(VisibleAnywhere, Category = "AA|Components")
+	TObjectPtr<UTSGHealthComponent> HealthComponent;
+
 #pragma endregion COMPONENTS
+
+#pragma region REFERENCES
+
+private:
+	
+	/** GameMode's reference */
+	UPROPERTY()
+	TObjectPtr<ATSGGameMode> GameMode;
+
+	/** GameMode's reference */
+	UPROPERTY()
+	TObjectPtr<APlayerController> PlayerController;
+
+#pragma endregion REFERENCES
 
 #pragma region INPUT
 
-public:
+private:
 
 	/** Called for movement input */
 	UFUNCTION()
@@ -82,6 +103,28 @@ public:
 	UFUNCTION()
 	void Aim(const FInputActionValue& Value);
 
+	/** Aiming input (Gamepad) */
+	void Aim_Gamepad(const FInputActionValue& Value);
+
+	/** Aiming input (Mouse) */
+	void Aim_Mouse(const FInputActionValue& Value);
+
+private:
+
+	/** Last rotation saved when aiming */
+	FRotator LastAimRotation;
+
+	/** Aim input threshold when using gamepad, for affecting the character only when this threshold is surpassed */
+	UPROPERTY(EditDefaultsOnly)
+	float AimGamepadInputThreshold = 0.3f;
+
 #pragma endregion INPUT
+
+#pragma region GAS
+
+	/** Get AbilitySystemComponent */
+	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+
+#pragma endregion GAS
 	
 };
