@@ -7,19 +7,29 @@
 #include "GameplayAbilitySpec.h"
 
 // Headers - TwinStickGAS
-#include "General/Enums/ActionInputID.h"
+#include "General/Enums/AbilityInputID.h"
 
-#include "ActionInputBinding.generated.h"
+#include "AbilityInputBinding.generated.h"
 
+// Forward declarations - TwinStickGAS
+class UTSGBaseAbility;
 
 USTRUCT()
-struct FActionInputBinding
+struct FAbilityInputBinding
 {
 	GENERATED_BODY()
 
-	/** Action Input ID */
+	/** Ability class */
 	UPROPERTY(EditDefaultsOnly)
-	EActionInputID ActionInputID = EActionInputID::NONE;
+	TSubclassOf<UTSGBaseAbility> AbilityClass;
+
+	/** Ability level */
+	UPROPERTY(EditDefaultsOnly, meta = (ClampMin = 1, UIMin = 1))
+	int32 Level = 1;
+
+	/** Ability input ID */
+	UPROPERTY(EditDefaultsOnly)
+	EAbilityInputID InputID = EAbilityInputID::NONE;
 
 	/** Handle when input is pressed */
 	uint32 OnPressedHandle = 0;

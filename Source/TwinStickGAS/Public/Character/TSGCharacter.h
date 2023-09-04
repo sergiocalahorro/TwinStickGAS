@@ -14,12 +14,14 @@ class USpringArmComponent;
 class UCameraComponent;
 class UInputComponent;
 struct FInputActionValue;
+struct FGameplayAbilitySpecHandle;
 
 // Forward declarations - TwinStickGAS
 class ATSGGameMode;
 class UTSGInputBindingComponent;
 class UTSGAbilitySystemComponent;
 class UTSGHealthComponent;
+class UTSGBaseAbility;
 
 UCLASS(config=Game)
 class ATSGCharacter : public ACharacter, public IAbilitySystemInterface
@@ -115,7 +117,7 @@ private:
 	FRotator LastAimRotation;
 
 	/** Aim input threshold when using gamepad, for affecting the character only when this threshold is surpassed */
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, Category = " AA|Input")
 	float AimGamepadInputThreshold = 0.3f;
 
 #pragma endregion INPUT

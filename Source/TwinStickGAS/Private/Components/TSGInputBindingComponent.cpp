@@ -3,10 +3,16 @@
 #include "Components/TSGInputBindingComponent.h"
 
 // Headers - Unreal Engine
+#include "AbilitySystemComponent.h"
+#include "AbilitySystemGlobals.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
 #include "GameplayAbilitySpec.h"
+
+// Headers - TwinStickGAS
+#include "GAS/Abilities/TSGBaseAbility.h"
+#include "GAS/AbilitySystem/TSGAbilitySystemComponent.h"
 
 #pragma region OVERRIDES
 
@@ -104,10 +110,11 @@ void UTSGInputBindingComponent::SetupInputComponent(APawn* Pawn)
 /** Release input component from old controller */
 void UTSGInputBindingComponent::ReleaseInputComponent(AController* OldController)
 {
+	ResetBindings();
+	
 	UEnhancedInputLocalPlayerSubsystem* Subsystem = GetEnhancedInputSubsystem(OldController);
 	if (Subsystem && InputComponent)
 	{
-		TeardownPlayerControls(InputComponent);
 		if (InputMappingContext)
 		{
 			Subsystem->RemoveMappingContext(InputMappingContext);
@@ -117,48 +124,65 @@ void UTSGInputBindingComponent::ReleaseInputComponent(AController* OldController
 	InputComponent = nullptr;
 }
 
+/** Reset input bindings */
+void UTSGInputBindingComponent::ResetBindings()
+{
+	if (InputComponent)
+	{
+		InputComponent->ClearActionBindings();
+	}
+	
+	for (auto& InputAbility : MappedAbilities)
+	{
+		if (AbilitySystemComponent)
+		{
+			const int32 ExpectedInputID = static_cast<int32>(InputAbility.Value.InputID);
+			for (const FGameplayAbilitySpecHandle& AbilitySpecHandle : InputAbility.Value.BoundAbilitiesStack)
+			{
+				FGameplayAbilitySpec* FoundAbility = AbilitySystemComponent->FindAbilitySpecFromHandle(AbilitySpecHandle);
+				if (FoundAbility && FoundAbility->InputID == ExpectedInputID)
+				{
+					FoundAbility->InputID = static_cast<int32>(EAbilityInputID::NONE);
+				}
+			}
+		}
+	}
+
+	AbilitySystemComponent = nullptr;
+}
+
 /** Setup player's controls */
 void UTSGInputBindingComponent::SetupPlayerControls(UEnhancedInputComponent* PlayerInputComponent)
 {
-	// ToDo: Abilities
-	
 	if (!PlayerInputComponent)
 	{
 		return;
 	}
+
+	ResetBindings();
+
+	PlayerInputComponent->BindAction(InputActionMove, ETriggerEvent::Triggered, this, &UTSGInputBindingComponent::InputMove_Triggered);
+	PlayerInputComponent->BindAction(InputActionAim, ETriggerEvent::Triggered, this, &UTSGInputBindingComponent::InputAim_Triggered);
 	
-	for (auto& Action : MappedActions)
+	SetupAbilitySystem();
+	
+	for (auto& InputAbility : MappedAbilities)
 	{
-		UInputAction* InputAction = Action.Key;
-		FActionInputBinding& ActionInputBinding = Action.Value;
-		
-		switch(ActionInputBinding.ActionInputID)
+		if (UInputAction* InputAction = InputAbility.Key)
 		{
-		case EActionInputID::Move:
-			PlayerInputComponent->BindAction(InputAction, ETriggerEvent::Triggered, this, &UTSGInputBindingComponent::InputMove_Triggered);
-			break;
-
-		case EActionInputID::Aim:
-			PlayerInputComponent->BindAction(InputAction, ETriggerEvent::Triggered, this, &UTSGInputBindingComponent::InputAim_Triggered);
-			break;
-
-		default:
-			ActionInputBinding.OnPressedHandle = PlayerInputComponent->BindAction(InputAction, ETriggerEvent::Started, this, &UTSGInputBindingComponent::InputAction_Pressed, InputAction).GetHandle();
-			ActionInputBinding.OnReleasedHandle = PlayerInputComponent->BindAction(InputAction, ETriggerEvent::Completed, this, &UTSGInputBindingComponent::InputAction_Released, InputAction).GetHandle();
-			break;
+			if (FAbilityInputBinding* AbilityInputBinding = &InputAbility.Value)
+			{
+				AbilityInputBinding->OnPressedHandle = PlayerInputComponent->BindAction(InputAction, ETriggerEvent::Started, this, &UTSGInputBindingComponent::InputAction_Pressed, InputAction).GetHandle();
+				AbilityInputBinding->OnReleasedHandle = PlayerInputComponent->BindAction(InputAction, ETriggerEvent::Completed, this, &UTSGInputBindingComponent::InputAction_Released, InputAction).GetHandle();
+				
+				const FGameplayAbilitySpecHandle AbilitySpecHandle = AbilitySystemComponent->GrantAbility(AbilityInputBinding->AbilityClass, AbilityInputBinding->Level, static_cast<int32>(AbilityInputBinding->InputID));
+				if (FGameplayAbilitySpec* FoundAbility = AbilitySystemComponent->FindAbilitySpecFromHandle(AbilitySpecHandle))
+				{
+					FoundAbility->InputID = static_cast<int32>(AbilityInputBinding->InputID);
+				}
+			}
 		}
 	}
-}
-
-/** Undo player's control setup */
-void UTSGInputBindingComponent::TeardownPlayerControls(UEnhancedInputComponent* PlayerInputComponent)
-{
-	if (!PlayerInputComponent)
-	{
-		return;
-	}
-	
-	PlayerInputComponent->ClearActionEventBindings();
 }
 
 /** Get enhanced input subsystem */
@@ -196,13 +220,41 @@ void UTSGInputBindingComponent::InputAim_Triggered(const FInputActionValue& Valu
 /** Handle action input pressed event */
 void UTSGInputBindingComponent::InputAction_Pressed(UInputAction* InputAction)
 {
-	// ToDo: Abilities
+	if (!AbilitySystemComponent)
+	{
+		SetupAbilitySystem();
+	}
+
+	check(AbilitySystemComponent);
+	
+	if (FAbilityInputBinding* AbilityInputBinding = MappedAbilities.Find(InputAction))
+	{
+		AbilitySystemComponent->AbilityLocalInputPressed(static_cast<int32>(AbilityInputBinding->InputID));
+	}
 }
 
 /** Handle action input released event */
 void UTSGInputBindingComponent::InputAction_Released(UInputAction* InputAction)
 {
-	// ToDo: Abilities
+	check(AbilitySystemComponent);
+	
+	if (FAbilityInputBinding* AbilityInputBinding = MappedAbilities.Find(InputAction))
+	{
+		AbilitySystemComponent->AbilityLocalInputReleased(static_cast<int32>(AbilityInputBinding->InputID));
+	}
 }
 
 #pragma endregion INPUT
+
+#pragma region GAS
+
+/** Setup ability system */
+void UTSGInputBindingComponent::SetupAbilitySystem()
+{
+	const AActor* ComponentOwner = GetOwner();
+	check(ComponentOwner);
+
+	AbilitySystemComponent = CastChecked<UTSGAbilitySystemComponent>(UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(ComponentOwner));
+}
+
+#pragma endregion GAS

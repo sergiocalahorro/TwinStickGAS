@@ -7,7 +7,7 @@
 #include "Components/PawnComponent.h"
 
 // Headers - TwinStickGAS
-#include "General/Structs/ActionInputBinding.h"
+#include "General/Structs/AbilityInputBinding.h"
 
 #include "TSGInputBindingComponent.generated.h"
 
@@ -16,6 +16,9 @@ class UInputMappingContext;
 class UInputAction;
 class UEnhancedInputLocalPlayerSubsystem;
 struct FInputActionValue;
+
+// Forward declarations - TwinStickGAS
+class UTSGAbilitySystemComponent;
 
 DECLARE_DYNAMIC_DELEGATE_OneParam(FMoveTriggeredSignature, const FInputActionValue&, Value);
 DECLARE_DYNAMIC_DELEGATE_OneParam(FAimTriggeredSignature, const FInputActionValue&, Value);
@@ -61,11 +64,11 @@ private:
 	/** Release input component from old controller */
 	void ReleaseInputComponent(AController* OldController = nullptr);
 
+	/** Reset input bindings */
+	void ResetBindings();
+
 	/** Setup player's controls */
 	void SetupPlayerControls(UEnhancedInputComponent* PlayerInputComponent);
-
-	/** Undo player's control setup */
-	void TeardownPlayerControls(UEnhancedInputComponent* PlayerInputComponent);
 
 	/** Get enhanced input subsystem */
 	UEnhancedInputLocalPlayerSubsystem* GetEnhancedInputSubsystem(AController* OldController = nullptr) const;
@@ -96,13 +99,36 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "AA|Input")
 	TObjectPtr<UInputMappingContext> InputMappingContext;
 
-	/** Mapped actions */
+	/** Move Input Action */
 	UPROPERTY(EditDefaultsOnly, Category = "AA|Input")
-	TMap<TObjectPtr<UInputAction>, FActionInputBinding> MappedActions;
+	TObjectPtr<UInputAction> InputActionMove;
 
-	/** The input component that is currently bound */
+	/** Aim Input Action */
+	UPROPERTY(EditDefaultsOnly, Category = "AA|Input")
+	TObjectPtr<UInputAction> InputActionAim;
+
+	/** Mapped abilities */
+	UPROPERTY(EditDefaultsOnly, Category = "AA|Input")
+	TMap<TObjectPtr<UInputAction>, FAbilityInputBinding> MappedAbilities;
+
+	/** Input component that is currently bound */
 	UPROPERTY(transient)
-	UEnhancedInputComponent* InputComponent;
+	TObjectPtr<UEnhancedInputComponent> InputComponent;
 
 #pragma endregion INPUT
+
+#pragma region GAS
+
+public:
+
+	/** Setup ability system */
+	void SetupAbilitySystem();
+
+private:
+
+	/** Ability system component */
+	UPROPERTY(transient)
+	TObjectPtr<UTSGAbilitySystemComponent> AbilitySystemComponent;
+	
+#pragma endregion GAS
 };

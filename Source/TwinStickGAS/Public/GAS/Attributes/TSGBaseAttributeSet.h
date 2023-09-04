@@ -18,7 +18,7 @@ class UTSGAbilitySystemComponent;
 		GAMEPLAYATTRIBUTE_VALUE_SETTER(PropertyName) \
 		GAMEPLAYATTRIBUTE_VALUE_INITTER(PropertyName)
 
-DECLARE_MULTICAST_DELEGATE_FourParams(FTSGAttributeSignature, AActor* EffectInstigator, AActor* EffectCauser, const FGameplayEffectSpec& EffectSpec, float EffectMagnitude);
+DECLARE_MULTICAST_DELEGATE_FourParams(FAttributeEvent, AActor* EffectInstigator, AActor* EffectCauser, const FGameplayEffectSpec& EffectSpec, float EffectMagnitude);
 
 /**
  * 

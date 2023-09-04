@@ -32,7 +32,7 @@ ATSGCharacter::ATSGCharacter()
 	bUseControllerRotationRoll = false;
 
 	// Configure character movement
-	GetCharacterMovement()->bOrientRotationToMovement = true;
+	GetCharacterMovement()->bOrientRotationToMovement = false;
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 500.0f, 0.0f);
 	GetCharacterMovement()->MaxWalkSpeed = 500.f;
 	GetCharacterMovement()->MinAnalogWalkSpeed = 20.f;
@@ -42,8 +42,8 @@ ATSGCharacter::ATSGCharacter()
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
 	SpringArm->SetupAttachment(RootComponent);
 	SpringArm->SetUsingAbsoluteRotation(true);
-	SpringArm->SetRelativeRotation(FRotator(-80.f, 0.f, 0.f));
-	SpringArm->TargetArmLength = 900.f;
+	SpringArm->SetRelativeRotation(FRotator(-75.f, 0.f, 0.f));
+	SpringArm->TargetArmLength = 800.f;
 	SpringArm->bDoCollisionTest = false;
 
 	// Camera

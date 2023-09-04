@@ -5,14 +5,12 @@
 // Headers - Unreal Engine
 #include "CoreMinimal.h"
 
-#include "ActionInputID.generated.h"
+#include "AbilityInputID.generated.h"
 
 
 UENUM()
-enum class EActionInputID : uint8
+enum class EAbilityInputID : uint8
 {
 	NONE,
-	Move,
-	Aim,
 	Shoot
 };

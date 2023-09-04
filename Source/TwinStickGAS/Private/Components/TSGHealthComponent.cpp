@@ -5,6 +5,7 @@
 // Headers - TwinStickGAS
 #include "GAS/AbilitySystem/TSGAbilitySystemComponent.h"
 #include "GAS/Attributes/TSGHealthAttributeSet.h"
+#include "GAS/BlueprintFunctionLibraries/TSGAbilitySystemBlueprintLibrary.h"
 
 #pragma region INITIALIZATION
 
@@ -38,6 +39,8 @@ void UTSGHealthComponent::InitializeWithAbilitySystem(UTSGAbilitySystemComponent
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(UTSGHealthAttributeSet::GetHealthAttribute()).AddUObject(this, &UTSGHealthComponent::HandleHealthChanged);
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(UTSGHealthAttributeSet::GetMaxHealthAttribute()).AddUObject(this, &UTSGHealthComponent::HandleMaxHealthChanged);
 
+	AbilitySystemComponent->SetNumericAttributeBase(UTSGHealthAttributeSet::GetHealthAttribute(), HealthAttributeSet->GetMaxHealth());
+	
 	HealthChangedDelegate.Broadcast(this, HealthAttributeSet->GetHealth(), HealthAttributeSet->GetHealth(), nullptr);
 	MaxHealthChangedDelegate.Broadcast(this, HealthAttributeSet->GetHealth(), HealthAttributeSet->GetHealth(), nullptr);
 }
@@ -45,13 +48,13 @@ void UTSGHealthComponent::InitializeWithAbilitySystem(UTSGAbilitySystemComponent
 /** Handle changes in Health attribute */
 void UTSGHealthComponent::HandleHealthChanged(const FOnAttributeChangeData& ChangeData)
 {
-	// HealthChangedDelegate.Broadcast(this, ChangeData.OldValue, ChangeData.NewValue, GetInstigatorFromAttrChangeData(ChangeData));
+	HealthChangedDelegate.Broadcast(this, ChangeData.OldValue, ChangeData.NewValue, UTSGAbilitySystemBlueprintLibrary::GetInstigatorFromAttributeChangeData(ChangeData));
 }
 
 /** Handle changes in MaxHealth attribute */
 void UTSGHealthComponent::HandleMaxHealthChanged(const FOnAttributeChangeData& ChangeData)
 {
-	// MaxHealthChangedDelegate.Broadcast(this, ChangeData.OldValue, ChangeData.NewValue, GetInstigatorFromAttrChangeData(ChangeData));
+	MaxHealthChangedDelegate.Broadcast(this, ChangeData.OldValue, ChangeData.NewValue, UTSGAbilitySystemBlueprintLibrary::GetInstigatorFromAttributeChangeData(ChangeData));
 }
 
 #pragma endregion HEALTH

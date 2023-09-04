@@ -56,6 +56,12 @@ public:
 	/** Accessor for MaxHealth attribute */
 	ATTRIBUTE_ACCESSORS(UTSGHealthAttributeSet, MaxHealth);
 
+	/** Accessor for Healing meta attribute */
+	ATTRIBUTE_ACCESSORS(UTSGHealthAttributeSet, Healing);
+
+	/** Accessor for Damage meta attribute */
+	ATTRIBUTE_ACCESSORS(UTSGHealthAttributeSet, Damage);
+
 private:
 
 	/** Health attribute */
@@ -65,6 +71,14 @@ private:
 	/** MaxHealth attribute */
 	UPROPERTY(BlueprintReadOnly, Category = "AA|Health", ReplicatedUsing = OnRep_MaxHealth, meta = (AllowPrivateAccess = true))
 	FGameplayAttributeData MaxHealth;
+	
+	/** Meta attribute: Incoming healing. This is mapped directly to +Health */
+	UPROPERTY(BlueprintReadOnly, Category="AA|Health", meta = (AllowPrivateAccess = true))
+	FGameplayAttributeData Healing;
+
+	/** Meta attribute: Incoming damage. This is mapped directly to -Health */
+	UPROPERTY(BlueprintReadOnly, Category="AA|Health", meta = (HideFromModifiers, AllowPrivateAccess = true))
+	FGameplayAttributeData Damage;
 
 #pragma endregion HEALTH
 	
