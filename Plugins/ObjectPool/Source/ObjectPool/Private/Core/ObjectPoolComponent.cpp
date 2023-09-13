@@ -89,6 +89,7 @@ void UObjectPoolComponent::CreatePoolPerClass(TSubclassOf<AActor> PoolableObject
 			}
 		}
 	}
+	
 	PoolPerClass.Add(PoolableObjectClass, ActorArray);
 }
 
@@ -105,34 +106,6 @@ AActor* UObjectPoolComponent::GetPooledObject(TSubclassOf<AActor> PoolableObject
 			{
 				if (!PoolableComponent->IsEnabled())
 				{
-					TArray<int32> UsedIndices;
-					if (PoolPerClassUsedIndices.Contains(PoolableObjectClass))
-					{
-						UsedIndices = PoolPerClassUsedIndices.Find(PoolableObjectClass)->Integers;
-					}
-					UsedIndices.Add(i);
-					PoolPerClassUsedIndices.Add(PoolableObjectClass, FIntegerArray(UsedIndices));
-
-					ObjectInPool->SetActorTransform(SpawnTransform);
-					PoolableComponent->Enable();
-					return ObjectInPool;
-				}
-			}
-		}
-
-		// In case all objects in pool are being used, retrieve the one that was first enabled 
-		if (PoolPerClassUsedIndices.Contains(PoolableObjectClass))
-		{
-			TArray<int32> UsedIndices = PoolPerClassUsedIndices.Find(PoolableObjectClass)->Integers;
-			if (!UsedIndices.IsEmpty())
-			{
-				const int Index = UsedIndices.Pop();
-				AActor* ObjectInPool = PoolPerClass.Find(PoolableObjectClass)->Actors[Index];
-				if (UPoolableComponent* PoolableComponent = Cast<UPoolableComponent>(ObjectInPool->FindComponentByClass(UPoolableComponent::StaticClass())))
-				{
-					UsedIndices.Add(Index);
-					PoolPerClassUsedIndices.Add(PoolableObjectClass, FIntegerArray(UsedIndices));
-
 					ObjectInPool->SetActorTransform(SpawnTransform);
 					PoolableComponent->Enable();
 					return ObjectInPool;
@@ -140,6 +113,8 @@ AActor* UObjectPoolComponent::GetPooledObject(TSubclassOf<AActor> PoolableObject
 			}
 		}
 	}
+	
+	UE_LOG(LogTemp, Error, TEXT("UObjectPoolComponent::GetPooledObject - Failed to retrive object of Class %s, please consider increasing the pool's size"), *GetNameSafe(PoolableObjectClass));
 	return nullptr;
 }
 

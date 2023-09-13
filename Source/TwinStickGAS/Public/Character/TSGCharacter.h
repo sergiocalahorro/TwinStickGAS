@@ -6,6 +6,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "AbilitySystemInterface.h"
+#include "General/Interfaces/TSGShooterInterface.h"
 
 #include "TSGCharacter.generated.h"
 
@@ -22,9 +23,10 @@ class UTSGInputBindingComponent;
 class UTSGAbilitySystemComponent;
 class UTSGHealthComponent;
 class UTSGBaseAbility;
+class UObjectPoolComponent;
 
-UCLASS(config=Game)
-class ATSGCharacter : public ACharacter, public IAbilitySystemInterface
+UCLASS(config=Game, Abstract, Blueprintable)
+class ATSGCharacter : public ACharacter, public IAbilitySystemInterface, public ITSGShooterInterface
 {
 	GENERATED_BODY()
 
@@ -37,7 +39,6 @@ public:
 	
 #pragma endregion INITIALIZATION
 
-	
 #pragma region OVERRIDES
 
 protected:
@@ -65,6 +66,10 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "AA|Components")
 	TObjectPtr<UCameraComponent> Camera;
 
+	/** ShootPoint */
+	UPROPERTY(VisibleAnywhere, Category = "AA|Components")
+	TObjectPtr<USceneComponent> ShootPoint;
+
 	/** Input binding component */
 	UPROPERTY(VisibleAnywhere, Category = "AA|Components")
 	TObjectPtr<UTSGInputBindingComponent> InputBindingComponent;
@@ -76,6 +81,10 @@ private:
 	/** Health component */
 	UPROPERTY(VisibleAnywhere, Category = "AA|Components")
 	TObjectPtr<UTSGHealthComponent> HealthComponent;
+
+	/** Object pool component */
+	UPROPERTY(VisibleAnywhere, Category = "AA|Components")
+	TObjectPtr<UObjectPoolComponent> ObjectPoolComponent;
 
 #pragma endregion COMPONENTS
 
@@ -128,5 +137,14 @@ private:
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
 #pragma endregion GAS
+
+#pragma region SHOOTER
+
+public:
+
+	/** Get shoot point's transform */
+	FTransform GetShootPointTransform() const override;
+
+#pragma endregion SHOOTER
 	
 };

@@ -50,7 +50,7 @@ public:
 	/** Get object from class's pool */
 	UFUNCTION(BlueprintCallable)
 	AActor* GetPooledObject(TSubclassOf<AActor> PoolableObjectClass, const FTransform& SpawnTransform);
-
+	
 private:
 
 	/** Whether pools should be created at start */
@@ -64,10 +64,6 @@ private:
 	/** Object pool per class */
 	UPROPERTY()
 	TMap<TSubclassOf<AActor>, FActorArray> PoolPerClass;
-
-	/** Object pool per class's used indices */
-	UPROPERTY()
-	TMap<TSubclassOf<AActor>, FIntegerArray> PoolPerClassUsedIndices;
 
 #pragma endregion OBJECT_POOL
 };

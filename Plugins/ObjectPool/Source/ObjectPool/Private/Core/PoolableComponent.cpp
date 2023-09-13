@@ -37,9 +37,9 @@ void UPoolableComponent::Disable()
 	{
 		Owner->SetActorHiddenInGame(true);
 		Owner->SetActorEnableCollision(false);
+		Owner->SetActorTransform(FTransform::Identity);
+		DisabledDelegate.Broadcast();
 	}
-	
-	DisabledDelegate.Broadcast();
 }
 
 #pragma endregion OBJECT_POOL

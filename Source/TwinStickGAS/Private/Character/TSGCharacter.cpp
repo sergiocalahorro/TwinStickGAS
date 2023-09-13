@@ -15,6 +15,7 @@
 // Headers - TwinStickGAS
 #include "Components/TSGHealthComponent.h"
 #include "Components/TSGInputBindingComponent.h"
+#include "Core/ObjectPoolComponent.h"
 #include "GameMode/TSGGameMode.h"
 #include "GAS/AbilitySystem/TSGAbilitySystemComponent.h"
 
@@ -51,6 +52,10 @@ ATSGCharacter::ATSGCharacter()
 	Camera->SetupAttachment(SpringArm, USpringArmComponent::SocketName);
 	Camera->bUsePawnControlRotation = false;
 
+	// Shoot Point
+	ShootPoint = CreateDefaultSubobject<USceneComponent>(TEXT("ShootPoint"));
+	ShootPoint->SetupAttachment(RootComponent);
+
 	// Input binding
 	InputBindingComponent = CreateDefaultSubobject<UTSGInputBindingComponent>(TEXT("InputBindingComponent"));
 
@@ -59,7 +64,11 @@ ATSGCharacter::ATSGCharacter()
 	AbilitySystemComponent->SetIsReplicated(true);
 	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Full);
 
+	// Health
 	HealthComponent = CreateDefaultSubobject<UTSGHealthComponent>(TEXT("HealthComponent"));
+
+	// Object pool
+	ObjectPoolComponent = CreateDefaultSubobject<UObjectPoolComponent>(TEXT("ObjectPoolComponent"));
 }
 
 #pragma endregion INITIALIZATION
@@ -198,3 +207,13 @@ UAbilitySystemComponent* ATSGCharacter::GetAbilitySystemComponent() const
 }
 
 #pragma endregion GAS
+
+#pragma region SHOOTER
+
+/** Get shoot point's transform */
+FTransform ATSGCharacter::GetShootPointTransform() const
+{
+	return ShootPoint->GetComponentTransform();
+}
+
+#pragma endregion SHOOTER
