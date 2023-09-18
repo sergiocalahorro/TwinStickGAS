@@ -6,6 +6,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "AbilitySystemInterface.h"
+#include "Destructibles/TSGDestructible.h"
 #include "General/Interfaces/TSGShooterInterface.h"
 
 #include "TSGCharacter.generated.h"
@@ -132,6 +133,8 @@ private:
 #pragma endregion INPUT
 
 #pragma region GAS
+
+public:
 
 	/** Get AbilitySystemComponent */
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;

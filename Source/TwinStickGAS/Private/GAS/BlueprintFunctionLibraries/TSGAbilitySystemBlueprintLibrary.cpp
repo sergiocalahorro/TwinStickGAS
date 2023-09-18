@@ -6,6 +6,9 @@
 #include "GameplayEffect.h"
 #include "GameplayEffectExtension.h"
 
+// Headers - TwinStickGAS
+#include "GAS/AbilitySystem/TSGAbilitySystemComponent.h"
+
 /** Get Instigator from attribute change data */
 AActor* UTSGAbilitySystemBlueprintLibrary::GetInstigatorFromAttributeChangeData(const FOnAttributeChangeData& ChangeData)
 {
@@ -16,4 +19,10 @@ AActor* UTSGAbilitySystemBlueprintLibrary::GetInstigatorFromAttributeChangeData(
 	}
 
 	return nullptr;
+}
+
+/** Get TSGAbilitySystemComponent from Actor */
+UTSGAbilitySystemComponent* UTSGAbilitySystemBlueprintLibrary::GetTSGAbilitySystemComponent(AActor* Actor)
+{
+	return CastChecked<UTSGAbilitySystemComponent>(GetAbilitySystemComponent(Actor));
 }

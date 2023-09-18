@@ -142,7 +142,7 @@ void UTSGInputBindingComponent::ResetBindings()
 				FGameplayAbilitySpec* FoundAbility = AbilitySystemComponent->FindAbilitySpecFromHandle(AbilitySpecHandle);
 				if (FoundAbility && FoundAbility->InputID == ExpectedInputID)
 				{
-					FoundAbility->InputID = static_cast<int32>(EAbilityInputID::NONE);
+					FoundAbility->InputID = static_cast<int32>(ETSGAbilityInputID::NONE);
 				}
 			}
 		}
@@ -170,7 +170,7 @@ void UTSGInputBindingComponent::SetupPlayerControls(UEnhancedInputComponent* Pla
 	{
 		if (UInputAction* InputAction = InputAbility.Key)
 		{
-			if (FAbilityInputBinding* AbilityInputBinding = &InputAbility.Value)
+			if (FTSGAbilityInputBinding* AbilityInputBinding = &InputAbility.Value)
 			{
 				AbilityInputBinding->OnPressedHandle = PlayerInputComponent->BindAction(InputAction, ETriggerEvent::Started, this, &UTSGInputBindingComponent::InputAction_Pressed, InputAction).GetHandle();
 				AbilityInputBinding->OnReleasedHandle = PlayerInputComponent->BindAction(InputAction, ETriggerEvent::Completed, this, &UTSGInputBindingComponent::InputAction_Released, InputAction).GetHandle();
@@ -227,7 +227,7 @@ void UTSGInputBindingComponent::InputAction_Pressed(UInputAction* InputAction)
 
 	check(AbilitySystemComponent);
 	
-	if (FAbilityInputBinding* AbilityInputBinding = MappedAbilities.Find(InputAction))
+	if (FTSGAbilityInputBinding* AbilityInputBinding = MappedAbilities.Find(InputAction))
 	{
 		AbilitySystemComponent->AbilityLocalInputPressed(static_cast<int32>(AbilityInputBinding->InputID));
 	}
@@ -238,7 +238,7 @@ void UTSGInputBindingComponent::InputAction_Released(UInputAction* InputAction)
 {
 	check(AbilitySystemComponent);
 	
-	if (FAbilityInputBinding* AbilityInputBinding = MappedAbilities.Find(InputAction))
+	if (FTSGAbilityInputBinding* AbilityInputBinding = MappedAbilities.Find(InputAction))
 	{
 		AbilitySystemComponent->AbilityLocalInputReleased(static_cast<int32>(AbilityInputBinding->InputID));
 	}

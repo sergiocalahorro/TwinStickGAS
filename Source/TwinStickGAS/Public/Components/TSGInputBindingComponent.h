@@ -7,7 +7,7 @@
 #include "Components/PawnComponent.h"
 
 // Headers - TwinStickGAS
-#include "General/Structs/AbilityInputBinding.h"
+#include "General/Structs/TSGAbilityInputBinding.h"
 
 #include "TSGInputBindingComponent.generated.h"
 
@@ -109,7 +109,7 @@ private:
 
 	/** Mapped abilities */
 	UPROPERTY(EditDefaultsOnly, Category = "AA|Input")
-	TMap<TObjectPtr<UInputAction>, FAbilityInputBinding> MappedAbilities;
+	TMap<TObjectPtr<UInputAction>, FTSGAbilityInputBinding> MappedAbilities;
 
 	/** Input component that is currently bound */
 	UPROPERTY(transient)

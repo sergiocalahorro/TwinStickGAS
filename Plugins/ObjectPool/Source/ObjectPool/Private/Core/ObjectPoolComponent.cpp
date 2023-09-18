@@ -77,6 +77,7 @@ void UObjectPoolComponent::CreatePoolPerClass(TSubclassOf<AActor> PoolableObject
 	{
 		if (AActor* Object = GetWorld()->SpawnActor<AActor>(PoolableObjectClass, FTransform::Identity))
 		{
+			Object->SetOwner(GetOwner());
 			if (UPoolableComponent* PoolableComponent = Cast<UPoolableComponent>(Object->FindComponentByClass(UPoolableComponent::StaticClass())))
 			{
 				PoolableComponent->Disable();

@@ -8,6 +8,9 @@
 
 #include "TSGAbilitySystemBlueprintLibrary.generated.h"
 
+// Forward declarations - TwinStickGAS
+class UTSGAbilitySystemComponent;
+
 /**
  * 
  */
@@ -20,4 +23,7 @@ public:
 
 	/** Get Instigator from attribute change data */
 	static AActor* GetInstigatorFromAttributeChangeData(const FOnAttributeChangeData& ChangeData);
+
+	/** Get TSGAbilitySystemComponent from Actor */
+	static UTSGAbilitySystemComponent* GetTSGAbilitySystemComponent(AActor* Actor);
 };

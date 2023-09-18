@@ -29,7 +29,7 @@ void UTSGHealthComponent::InitializeWithAbilitySystem(UTSGAbilitySystemComponent
 
 	AbilitySystemComponent = InASC;
 	
-	HealthAttributeSet = AbilitySystemComponent->GetSet<UTSGHealthAttributeSet>();
+	HealthAttributeSet = AbilitySystemComponent->AddSet<UTSGHealthAttributeSet>();
 	if (!HealthAttributeSet)
 	{
 		return;

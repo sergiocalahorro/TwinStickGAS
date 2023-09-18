@@ -6,9 +6,12 @@
 #include "Components/SphereComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "AbilitySystemInterface.h"
 
 // Headers - TwinStickGAS
 #include "Core/PoolableComponent.h"
+#include "GAS/AbilitySystem/TSGAbilitySystemComponent.h"
+#include "GAS/BlueprintFunctionLibraries/TSGAbilitySystemBlueprintLibrary.h"
 #include "Projectiles/TSGProjectileData.h"
 
 #pragma region INITIALIZATION
@@ -92,6 +95,21 @@ void ATSGProjectile::InitializeProjectile() const
 /** Handle projectile's hit */
 void ATSGProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
+	// Apply effects on hit
+	if (const IAbilitySystemInterface* AbilitySystemActor = Cast<IAbilitySystemInterface>(OtherActor))
+	{
+		for (const TSubclassOf<UGameplayEffect>& Effect : ProjectileData->Effects)
+		{
+			if (UTSGAbilitySystemComponent* AbilitySystemComponent = UTSGAbilitySystemBlueprintLibrary::GetTSGAbilitySystemComponent(GetOwner()))
+			{
+				FGameplayEffectContextHandle EffectContext = AbilitySystemComponent->MakeEffectContext();
+				EffectContext.AddInstigator(GetOwner(), this);
+				FGameplayEffectSpecHandle EffectSpec = AbilitySystemComponent->MakeOutgoingSpec(Effect, 1.f, EffectContext);
+				AbilitySystemComponent->ApplyGameplayEffectSpecToTarget(*EffectSpec.Data, AbilitySystemActor->GetAbilitySystemComponent());
+			}
+		}
+	}
+	
 	PoolableComponent->Disable();
 }
 

@@ -4,7 +4,7 @@
 
 // Headers - TwinStickGAS
 #include "GAS/Abilities/TSGBaseAbility.h"
-#include "General/Enums/AbilityInputID.h"
+#include "General/Enums/TSGAbilityInputID.h"
 
 #pragma region INITIALIZATION
 

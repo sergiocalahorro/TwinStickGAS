@@ -15,7 +15,7 @@ struct FOnAttributeChangeData;
 class UTSGAbilitySystemComponent;
 class UTSGHealthAttributeSet;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FHealthAttributeChangedSignature, UTSGHealthComponent*, HealthComponent, float, OldValue, float, NewValue, AActor*, Instigator);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FHealthAttributeChangedSignature, UTSGHealthComponent*, TSGHealthComponent, float, OldValue, float, NewValue, AActor*, EffectInstigator);
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class TWINSTICKGAS_API UTSGHealthComponent : public UActorComponent

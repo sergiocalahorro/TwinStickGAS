@@ -48,7 +48,26 @@ public:
 	UFUNCTION()
 	virtual void OnRep_MaxHealth(const FGameplayAttributeData& OldMaxHealth);
 
-public:
+	/** Called just before modifying the value of an attribute. AttributeSet can make additional modifications here. Return true to continue, or false to throw out the modification */	
+	virtual bool PreGameplayEffectExecute(FGameplayEffectModCallbackData& Data) override;
+
+	/** Called just before a GameplayEffect is executed to modify the base value of an attribute. No more changes can be made */
+	virtual void PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data) override;
+
+	/** Called just before any modification happens to an attribute */
+	virtual void PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue) override;
+
+	/** Called just after any modification happens to an attribute */
+	virtual void PostAttributeChange(const FGameplayAttribute& Attribute, float OldValue, float NewValue) override;
+
+	/** This is called just before any modification happens to an attribute's base value when an attribute aggregator exists */
+	virtual void PreAttributeBaseChange(const FGameplayAttribute& Attribute, float& NewValue) const override;
+
+	/** Called just after any modification happens to an attribute's base value when an attribute aggregator exists */
+	virtual void PostAttributeBaseChange(const FGameplayAttribute& Attribute, float OldValue, float NewValue) const override;
+
+	/** Clamp the value of an attribute */
+	void ClampAttributeOnChange(const FGameplayAttribute& Attribute, float& NewValue) const;
 
 	/** Accessor for Health attribute */
 	ATTRIBUTE_ACCESSORS(UTSGHealthAttributeSet, Health);
@@ -60,12 +79,12 @@ public:
 	ATTRIBUTE_ACCESSORS(UTSGHealthAttributeSet, Healing);
 
 	/** Accessor for Damage meta attribute */
-	ATTRIBUTE_ACCESSORS(UTSGHealthAttributeSet, Damage);
-
+	ATTRIBUTE_ACCESSORS(UTSGHealthAttributeSet, Damage)
+	
 private:
 
 	/** Health attribute */
-	UPROPERTY(BlueprintReadOnly, Category = "AA|Health", ReplicatedUsing = OnRep_Health, meta = (HideFromModifiers, AllowPrivateAccess = true))
+	UPROPERTY(BlueprintReadOnly, Category = "AA|Health", ReplicatedUsing = OnRep_Health, meta = (AllowPrivateAccess = true)) // HideFromModifiers
 	FGameplayAttributeData Health;
 
 	/** MaxHealth attribute */
@@ -79,6 +98,12 @@ private:
 	/** Meta attribute: Incoming damage. This is mapped directly to -Health */
 	UPROPERTY(BlueprintReadOnly, Category="AA|Health", meta = (HideFromModifiers, AllowPrivateAccess = true))
 	FGameplayAttributeData Damage;
+
+	/** Used to track when the health reaches zero */
+	bool bOutOfHealth;
+
+	/** Delegate to broadcast when the Health attribute reaches zero */
+	FAttributeEvent OutOfHealthDelegate;
 
 #pragma endregion HEALTH
 	
